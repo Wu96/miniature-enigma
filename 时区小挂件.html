@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时区小挂件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #e0f2fe 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .timezone-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .timezone-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .time-display {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .delete-btn {
+            transition: color 0.2s ease;
+        }
+        
+        .delete-btn:hover {
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="max-w-6xl mx-auto">
+        <!-- 标题区域 -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-3">🌍 时区小挂件</h1>
+            <p class="text-lg text-gray-600">实时显示全球主要城市时间，支持自定义添加时区</p>
+        </div>
+
+        <!-- 添加时区表单 -->
+        <div class="timezone-card p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">➕ 添加时区</h2>
+            <div class="flex flex-col lg:flex-row gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        时区名称
+                    </label>
+                    <input
+                        type="text"
+                        id="timezoneName"
+                        placeholder="例如：旧金山"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        选择时区
+                    </label>
+                    <select
+                        id="timezoneSelect"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                        <option value="">请选择时区</option>
+                        <option value="Asia/Shanghai">北京 (+08:00)</option>
+                        <option value="America/New_York">纽约 (-05:00)</option>
+                        <option value="Europe/London">伦敦 (+00:00)</option>
+                        <option value="Asia/Tokyo">东京 (+09:00)</option>
+                        <option value="Australia/Sydney">悉尼 (+10:00)</option>
+                        <option value="America/Los_Angeles">洛杉矶 (-08:00)</option>
+                        <option value="Europe/Paris">巴黎 (+01:00)</option>
+                        <option value="Europe/Berlin">柏林 (+01:00)</option>
+                        <option value="Europe/Moscow">莫斯科 (+03:00)</option>
+                        <option value="Asia/Dubai">迪拜 (+04:00)</option>
+                    </select>
+                </div>
+                <div>
+                    <button
+                        id="addTimezoneBtn"
+                        class="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+                    >
+                        添加时区
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时区显示区域 -->
+        <div id="timezonesContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- 时区卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 空状态 -->
+        <div id="emptyState" class="text-center py-16 hidden">
+            <div class="text-gray-400 mb-6">
+                <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-medium text-gray-600 mb-3">暂无时区</h3>
+            <p class="text-gray-500">请添加上方的时区来开始使用</p>
+        </div>
+    </div>
+
+    <script>
+        // 时区数据
+        const timezones = [
+            { id: '1', name: '北京', timezone: 'Asia/Shanghai', offset: '+08:00' },
+            { id: '2', name: '纽约', timezone: 'America/New_York', offset: '-05:00' },
+            { id: '3', name: '伦敦', timezone: 'Europe/London', offset: '+00:00' },
+            { id: '4', name: '东京', timezone: 'Asia/Tokyo', offset: '+09:00' }
+        ];
+
+        // DOM 元素
+        const timezonesContainer = document.getElementById('timezonesContainer');
+        const emptyState = document.getElementById('emptyState');
+        const timezoneNameInput = document.getElementById('timezoneName');
+        const timezoneSelect = document.getElementById('timezoneSelect');
+        const addTimezoneBtn = document.getElementById('addTimezoneBtn');
+
+        // 更新时间显示
+        function updateTimes() {
+            timezones.forEach(tz => {
+                const timeElement = document.getElementById(`time-${tz.id}`);
+                if (timeElement) {
+                    try {
+                        const time = new Date().toLocaleString('zh-CN', {
+                            timeZone: tz.timezone,
+                            hour12: false,
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        timeElement.textContent = time;
+                    } catch (error) {
+                        timeElement.textContent = '时区错误';
+                    }
+                }
+            });
+        }
+
+        // 渲染时区卡片
+        function renderTimezones() {
+            timezonesContainer.innerHTML = '';
+            
+            if (timezones.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            timezones.forEach(tz => {
+                const card = document.createElement('div');
+                card.className = 'timezone-card p-6';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800">${tz.name}</h3>
+                            <p class="text-sm text-gray-500">
+                                ${tz.timezone} (UTC${tz.offset})
+                            </p>
+                        </div>
+                        <button 
+                            onclick="removeTimezone('${tz.id}')" 
+                            class="delete-btn text-red-500 hover:text-red-700"
+                            title="删除时区"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <div id="time-${tz.id}" class="time-display text-2xl text-gray-800 mb-2">
+                            加载中...
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            实时更新
+                        </div>
+                    </div>
+                `;
+                timezonesContainer.appendChild(card);
+            });
+        }
+
+        // 添加时区
+        function addTimezone() {
+            const name = timezoneNameInput.value.trim();
+            const timezone = timezoneSelect.value;
+            
+            if (!name || !timezone) {
+                alert('请填写时区名称并选择时区');
+                return;
+            }
+
+            // 获取时区偏移量
+            const offsetMap = {
+                'Asia/Shanghai': '+08:00',
+                'America/New_York': '-05:00',
+                'Europe/London': '+00:00',
+                'Asia/Tokyo': '+09:00',
+                'Australia/Sydney': '+10:00',
+                'America/Los_Angeles': '-08:00',
+                'Europe/Paris': '+01:00',
+                'Europe/Berlin': '+01:00',
+                'Europe/Moscow': '+03:00',
+                'Asia/Dubai': '+04:00'
+            };
+
+            const newTimezone = {
+                id: Date.now().toString(),
+                name: name,
+                timezone: timezone,
+                offset: offsetMap[timezone] || '+00:00'
+            };
+
+            timezones.push(newTimezone);
+            renderTimezones();
+            
+            // 清空表单
+            timezoneNameInput.value = '';
+            timezoneSelect.value = '';
+        }
+
+        // 删除时区
+        function removeTimezone(id) {
+            const index = timezones.findIndex(tz => tz.id === id);
+            if (index !== -1) {
+                timezones.splice(index, 1);
+                renderTimezones();
+            }
+        }
+
+        // 初始化
+        function init() {
+            renderTimezones();
+            setInterval(updateTimes, 1000);
+            updateTimes(); // 立即更新一次
+            
+            // 事件监听
+            addTimezoneBtn.addEventListener('click', addTimezone);
+            
+            // 回车键添加时区
+            timezoneNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addTimezone();
+                }
+            });
+        }
+
+        // 启动应用
+        init();
+    </script>
+</body>
+</html>
