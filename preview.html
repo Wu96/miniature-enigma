@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奥运会奖牌榜预览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .medal-table {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 24px;
+        }
+        
+        .controls {
+            background: #f9fafb;
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+        }
+        
+        .sort-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .sort-btn.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sort-btn:not(.active) {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .sort-btn:not(.active):hover {
+            background: #d1d5db;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            background: #f3f4f6;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        th:hover {
+            background: #e5e7eb;
+        }
+        
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .medal-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.125rem;
+        }
+        
+        .gold-medal {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .silver-medal {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .bronze-medal {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .total-medal {
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 12px;
+            width: 56px;
+        }
+        
+        .top-3-row {
+            background: linear-gradient(90deg, #fefce8 0%, transparent 100%);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer {
+            background: #f9fafb;
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="medal-table">
+        <!-- 表头 -->
+        <div class="table-header">
+            <h1 class="text-3xl font-bold mb-2">🏅 奥运会奖牌榜</h1>
+            <p class="text-blue-100">点击列标题进行排序</p>
+        </div>
+
+        <!-- 控制面板 -->
+        <div class="controls">
+            <!-- 搜索框 -->
+            <div class="mb-4">
+                <div class="search-box">
+                    <input
+                        type="text"
+                        placeholder="搜索国家或地区代码..."
+                        id="searchInput"
+                        class="w-full px-4 py-3 pl-12 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                    <div class="search-icon">🔍</div>
+                    <div class="clear-btn" id="clearSearch" style="display: none;">✕</div>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- 排序按钮组 -->
+                <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                    <button class="sort-btn active" data-field="gold">按金牌排序 ↓</button>
+                    <button class="sort-btn" data-field="silver">按银牌排序</button>
+                    <button class="sort-btn" data-field="bronze">按铜牌排序</button>
+                    <button class="sort-btn" data-field="total">按总数排序</button>
+                </div>
+
+                <!-- 筛选选项 -->
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="top3Only" style="width: 16px; height: 16px;">
+                        <span style="font-size: 0.875rem; font-weight: 500; color: #374151;">仅显示前三名</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 表格 -->
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>国家/地区</th>
+                        <th style="text-align: center;">🥇 金牌</th>
+                        <th style="text-align: center;">🥈 银牌</th>
+                        <th style="text-align: center;">🥉 铜牌</th>
+                        <th style="text-align: center;">总计</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- 数据将通过JavaScript动态生成 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 统计数据 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div style="font-size: 1.5rem; font-weight: bold; color: #d97706;" id="totalGold">339</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">总金牌数</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 1.5rem; font-weight: bold; color: #6b7280;" id="totalSilver">252</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">总银牌数</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 1.5rem; font-weight: bold; color: #ea580c;" id="totalBronze">239</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">总铜牌数</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 1.5rem; font-weight: bold; color: #1d4ed8;" id="totalMedals">830</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">总奖牌数</div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>数据来源：2020年东京奥运会（示例数据） • 共 <span id="countryCount">20</span> 个国家/地区</p>
+        </div>
+    </div>
+
+    <script>
+        // 示例数据
+        const medalData = [
+            { id: 1, name: '美国', code: 'USA', gold: 39, silver: 41, bronze: 33, total: 113 },
+            { id: 2, name: '中国', code: 'CHN', gold: 38, silver: 32, bronze: 18, total: 88 },
+            { id: 3, name: '日本', code: 'JPN', gold: 27, silver: 14, bronze: 17, total: 58 },
+            { id: 4, name: '英国', code: 'GBR', gold: 22, silver: 21, bronze: 22, total: 65 },
+            { id: 5, name: '俄罗斯奥委会', code: 'ROC', gold: 20, silver: 28, bronze: 23, total: 71 },
+            { id: 6, name: '澳大利亚', code: 'AUS', gold: 17, silver: 7, bronze: 22, total: 46 },
+            { id: 7, name: '荷兰', code: 'NED', gold: 10, silver: 12, bronze: 14, total: 36 },
+            { id: 8, name: '法国', code: 'FRA', gold: 10, silver: 12, bronze: 11, total: 33 },
+            { id: 9, name: '德国', code: 'GER', gold: 10, silver: 11, bronze: 16, total: 37 },
+            { id: 10, name: '意大利', code: 'ITA', gold: 10, silver: 10, bronze: 20, total: 40 },
+            { id: 11, name: '加拿大', code: 'CAN', gold: 7, silver: 6, bronze: 11, total: 24 },
+            { id: 12, name: '巴西', code: 'BRA', gold: 7, silver: 6, bronze: 8, total: 21 },
+            { id: 13, name: '新西兰', code: 'NZL', gold: 7, silver: 6, bronze: 7, total: 20 },
+            { id: 14, name: '古巴', code: 'CUB', gold: 7, silver: 3, bronze: 5, total: 15 },
+            { id: 15, name: '匈牙利', code: 'HUN', gold: 6, silver: 7, bronze: 7, total: 20 },
+            { id: 16, name: '韩国', code: 'KOR', gold: 6, silver: 4, bronze: 10, total: 20 },
+            { id: 17, name: '波兰', code: 'POL', gold: 4, silver: 5, bronze: 5, total: 14 },
+            { id: 18, name: '捷克', code: 'CZE', gold: 4, silver: 4, bronze: 3, total: 11 },
+            { id: 19, name: '肯尼亚', code: 'KEN', gold: 4, silver: 4, bronze: 2, total: 10 },
+            { id: 20, name: '挪威', code: 'NOR', gold: 4, silver: 2, bronze: 2, total: 8 },
+        ];
+
+        let currentSortField = 'gold';
+        let currentSortOrder = 'desc';
+        let searchTerm = '';
+        let showTop3Only = false;
+
+        // 获取排名符号
+        function getRank(index) {
+            if (index === 0) return '🥇';
+            if (index === 1) return '🥈';
+            if (index === 2) return '🥉';
+            return index + 1;
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            const countryCount = document.getElementById('countryCount');
+            
+            // 过滤数据
+            let filteredData = medalData.filter(country => 
+                country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                country.code.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (showTop3Only) {
+                filteredData = filteredData.slice(0, 3);
+            }
+
+            // 排序数据
+            const sortedData = [...filteredData].sort((a, b) => {
+                const aValue = a[currentSortField];
+                const bValue = b[currentSortField];
+                
+                if (currentSortOrder === 'asc') {
+                    return aValue - bValue;
+                } else {
+                    return bValue - aValue;
+                }
+            });
+
+            // 生成表格行
+            tableBody.innerHTML = sortedData.map((country, index) => `
+                <tr class="${index < 3 ? 'top-3-row' : ''} hover:bg-blue-50 transition-colors">
+                    <td style="font-size: 1.125rem; font-weight: bold; color: #1f2937;">
+                        ${getRank(index)}
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 1.5rem; font-weight: bold; color: #9ca3af;">
+                                ${country.code}
+                            </span>
+                            <span style="font-size: 1.125rem; font-weight: 600; color: #1f2937;">
+                                ${country.name}
+                            </span>
+                        </div>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="medal-count gold-medal">${country.gold}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="medal-count silver-medal">${country.silver}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="medal-count bronze-medal">${country.bronze}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="medal-count total-medal">${country.total}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            countryCount.textContent = sortedData.length;
+        }
+
+        // 更新排序按钮状态
+        function updateSortButtons() {
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                const field = btn.dataset.field;
+                if (field === currentSortField) {
+                    btn.classList.add('active');
+                    btn.textContent = `按${getFieldLabel(field)}排序 ${currentSortOrder === 'desc' ? '↓' : '↑'}`;
+                } else {
+                    btn.classList.remove('active');
+                    btn.textContent = `按${getFieldLabel(field)}排序`;
+                }
+            });
+        }
+
+        // 获取字段标签
+        function getFieldLabel(field) {
+            const labels = {
+                gold: '金牌',
+                silver: '银牌',
+                bronze: '铜牌',
+                total: '总数'
+            };
+            return labels[field];
+        }
+
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 排序按钮点击事件
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const field = btn.dataset.field;
+                    if (currentSortField === field) {
+                        currentSortOrder = currentSortOrder === 'desc' ? 'asc' : 'desc';
+                    } else {
+                        currentSortField = field;
+                        currentSortOrder = 'desc';
+                    }
+                    updateSortButtons();
+                    renderTable();
+                });
+            });
+
+            // 搜索框输入事件
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                document.getElementById('clearSearch').style.display = searchTerm ? 'block' : 'none';
+                renderTable();
+            });
+
+            // 清除搜索按钮
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                document.getElementById('searchInput').value = '';
+                searchTerm = '';
+                document.getElementById('clearSearch').style.display = 'none';
+                renderTable();
+            });
+
+            // 仅显示前三名复选框
+            document.getElementById('top3Only').addEventListener('change', (e) => {
+                showTop3Only = e.target.checked;
+                renderTable();
+            });
+        }
+
+        // 初始化
+        function init() {
+            updateSortButtons();
+            renderTable();
+            initEventListeners();
+        }
+
+        // 启动应用
+        init();
