@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信主题设计展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .wechat-green { background-color: #07C160; }
+        .wechat-light-green { background-color: #F0F9F4; }
+        .wechat-border { border-color: #E8E8E8; }
+        .message-bubble { 
+            background: linear-gradient(135deg, #07C160 0%, #06AE56 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto p-6">
+        <!-- 微信风格顶部栏 -->
+        <div class="wechat-green text-white py-4 px-6 rounded-t-2xl shadow-lg mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2v-6h2v6z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold">微信主题设计展示</h1>
+                        <p class="text-green-100 text-xs">时区小助手 - 微信风格版</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设计特色介绍 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- 颜色主题 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                    <h2 class="text-lg font-medium text-gray-800">微信绿色主题</h2>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-500 rounded"></div>
+                        <span class="text-sm text-gray-600">主色调 #07C160</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-400 rounded"></div>
+                        <span class="text-sm text-gray-600">辅助色 #06AE56</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-100 rounded"></div>
+                        <span class="text-sm text-gray-600">背景色 #F0F9F4</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设计元素 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                    <h2 class="text-lg font-medium text-gray-800">微信设计元素</h2>
+                </div>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li>• 圆角卡片设计 (rounded-2xl)</li>
+                    <li>• 柔和阴影效果</li>
+                    <li>• 渐变背景</li>
+                    <li>• 简洁图标</li>
+                    <li>• 消息气泡风格</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 组件展示 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                <h2 class="text-lg font-medium text-gray-800">时区卡片展示</h2>
+            </div>
+            
+            <!-- 示例时区卡片 -->
+            <div class="space-y-4">
+                <!-- 北京时区 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                                北
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">北京</h3>
+                                <p class="text-sm text-gray-500">
+                                    Asia/Shanghai • UTC+08:00
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+                        <div class="text-center">
+                            <div class="text-2xl font-mono text-gray-800 mb-2 font-medium">
+                                2025/11/29 15:43:36
+                            </div>
+                            <div class="text-sm text-green-600 font-medium">
+                                🕐 实时同步
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 纽约时区 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                                纽
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">纽约</h3>
+                                <p class="text-sm text-gray-500">
+                                    America/New_York • UTC-05:00
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+                        <div class="text-center">
+                            <div class="text-2xl font-mono text-gray-800 mb-2 font-medium">
+                                2025/11/29 02:43:36
+                            </div>
+                            <div class="text-sm text-green-600 font-medium">
+                                🕐 实时同步
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能特点 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                <h2 class="text-lg font-medium text-gray-800">微信主题特色功能</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center p-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">实时同步</h3>
+                    <p class="text-sm text-gray-600">秒级更新时间显示</p>
+                </div>
+                <div class="text-center p-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">便捷添加</h3>
+                    <p class="text-sm text-gray-600">支持自定义时区</p>
+                </div>
+                <div class="text-center p-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">主题切换</h3>
+                    <p class="text-sm text-gray-600">支持多种主题风格</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部提示 -->
+        <div class="text-center mt-8">
+            <p class="text-gray-500 text-sm">访问 <a href="http://localhost:5173/" class="text-green-500 hover:text-green-600 underline">http://localhost:5173/</a> 体验完整功能</p>
+        </div>
+    </div>
+</body>
+</html>
